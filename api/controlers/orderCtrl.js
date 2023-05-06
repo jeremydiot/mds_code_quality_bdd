@@ -1,7 +1,7 @@
 import {DateTime} from 'luxon'
 
 
-export default (orderRepo) => {
+export default (orderRepo, userRepo, recipeRepo) => {
   const listOrders = (_, res) => {
     const orders = orderRepo.listOrders().map(order => {
       return {...order, orderDate: order.orderDate.toFormat('yyyy-MM-dd') }
@@ -28,7 +28,12 @@ export default (orderRepo) => {
   }
 
   const createOrder = (req, res) => {
-    const order = orderRepo.createOrder({...req.body, orderDate: DateTime.fromFormat(req.body.orderDate, 'yyyy-MM-dd') });
+    const orderDate = DateTime.fromFormat(req.body.orderDate, 'yyyy-MM-dd'); 
+    if (!orderDate.isValid) return res.status(400).send({error: 'OrderDate format incorrect (yyyy-mm-dd)'})
+    if (userRepo.findUser(req.body.userId) === undefined) return res.status(404).send({error:  `User with id ${req.body.userId} not found`})
+    if (recipeRepo.findRecipe(req.body.recipeId) === undefined) return res.status(404).send({error:  `Recipe with id ${req.body.recipeId} not found`})
+
+    const order = orderRepo.createOrder({...req.body, orderDate });
 
     res.status(201).send({
       data: {...order, orderDate: order.orderDate.toFormat('yyyy-MM-dd') }
@@ -37,7 +42,13 @@ export default (orderRepo) => {
 
   const updateOrder = (req, res) => {
     const id = req.params.id;
-    const order = orderRepo.updateOrder(id, {...req.body, orderDate: DateTime.fromFormat(req.body.orderDate, 'yyyy-MM-dd') });
+
+    const orderDate = DateTime.fromFormat(req.body.orderDate, 'yyyy-MM-dd'); 
+    if (!orderDate.isValid) return res.status(400).send({error: 'OrderDate format incorrect (yyyy-mm-dd)'})
+    if (userRepo.findUser(req.body.userId) === undefined) return res.status(404).send({error:  `User with id ${req.body.userId} not found`})
+    if (recipeRepo.findRecipe(req.body.recipeId) === undefined) return res.status(404).send({error:  `Recipe with id ${req.body.recipeId} not found`})
+
+    const order = orderRepo.updateOrder(id, {...req.body, orderDate });
 
     
     if (order) {

@@ -28,7 +28,13 @@ export default (userRepo) => {
   }
 
   const createUser = (req, res) => {
-    const user = userRepo.createUser({...req.body, birthDate: DateTime.fromFormat(req.body.birthDate, 'yyyy-MM-dd') });
+
+    const birthDate = DateTime.fromFormat(req.body.birthDate, 'yyyy-MM-dd'); 
+    if (!birthDate.isValid) return res.status(400).send({error: 'BirthDate format incorrect (yyyy-mm-dd)'})
+
+    if(!/^(0|\+33|0033)[1-9][0-9]{8}$/.test(req.body.phone)) return res.status(400).send({error: 'Phone format incorrect (+33 or 0 or 0033 follewed by 9 digits)'})
+    
+    const user = userRepo.createUser({...req.body, birthDate });
 
     res.status(201).send({
       data: {...user, birthDate: user.birthDate.toFormat('yyyy-MM-dd') }
@@ -37,7 +43,13 @@ export default (userRepo) => {
 
   const updateUser = (req, res) => {
     const id = req.params.id;
-    const user = userRepo.updateUser(id, {...req.body, birthDate: DateTime.fromFormat(req.body.birthDate, 'yyyy-MM-dd') });
+
+    const birthDate = DateTime.fromFormat(req.body.birthDate, 'yyyy-MM-dd'); 
+    if (!birthDate.isValid) return res.status(400).send({error: 'BirthDate format incorrect (yyyy-mm-dd)'})
+
+    if(!/^(0|\+33|0033)[1-9][0-9]{8}$/.test(req.body.phone)) return res.status(400).send({error: 'Phone format incorrect (+33 or 0 or 0033 follewed by 9 digits)'})
+    
+    const user = userRepo.updateUser(id, {...req.body, birthDate });
 
     
     if (user) {

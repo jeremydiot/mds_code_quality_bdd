@@ -29,8 +29,22 @@ Feature: Users management
     And following new "user" item:
       | lastName | firstName | birthDate  | address                         | phone        | email                     |
       | GONZALEZ | Nathan    | 1992-04-18 | 268 Rue Jouffroy, 59100 Roubaix | +33674354418 | nathan.gonzalez@gmail.com |
+  
+  Scenario: Create a user with wrong birthdate format
+    When I create the following "user":
+      | lastName | firstName | birthDate  | address                         | phone        | email                     |
+      | GONZALEZ | Nathan    | 19920418   | 268 Rue Jouffroy, 59100 Roubaix | +33674354418 | nathan.gonzalez@gmail.com |
+    Then I should have response "BAD_REQUEST"
+    And following error : "BirthDate format incorrect (yyyy-mm-dd)"
 
-  Scenario: Update a user
+  Scenario: Create a user with wrong phone format
+    When I create the following "user":
+      | lastName | firstName | birthDate  | address                         | phone        | email                     |
+      | GONZALEZ | Nathan    | 1992-04-18 | 268 Rue Jouffroy, 59100 Roubaix | 674354418   | nathan.gonzalez@gmail.com |
+    Then I should have response "BAD_REQUEST"
+    And following error : "Phone format incorrect (+33 or 0 or 0033 follewed by 9 digits)"
+
+  Scenario: Update a user 
     When I update the "user" having id "63dcff89-47c5-4365-875d-8934a250d0fe" with following data:
       | lastName  | firstName | birthDate  | address                        | phone         | email                    |
       | BLANCHARD | Huguette  | 1996-06-30 | 14 allée oseraie 94260 fresnes | 0033678398215 | hugo.blanchard@gmail.com |
@@ -38,6 +52,20 @@ Feature: Users management
     And following "user" item:
       | id                                   | lastName  | firstName | birthDate  | address                        | phone         | email                    |
       | 63dcff89-47c5-4365-875d-8934a250d0fe | BLANCHARD | Huguette  | 1996-06-30 | 14 allée oseraie 94260 fresnes | 0033678398215 | hugo.blanchard@gmail.com |
+
+  Scenario: Update a user with wrong birthdate format
+    When I update the "user" having id "63dcff89-47c5-4365-875d-8934a250d0fe" with following data:
+      | lastName  | firstName | birthDate  | address                        | phone         | email                    |
+      | BLANCHARD | Huguette  | 19960630 | 14 allée oseraie 94260 fresnes | 0033678398215 | hugo.blanchard@gmail.com |
+    Then I should have response "BAD_REQUEST"
+    And following error : "BirthDate format incorrect (yyyy-mm-dd)"
+
+  Scenario: Update a user with wrong phone format
+    When I update the "user" having id "63dcff89-47c5-4365-875d-8934a250d0fe" with following data:
+      | lastName  | firstName | birthDate  | address                        | phone         | email                    |
+      | BLANCHARD | Huguette  | 1996-06-30 | 14 allée oseraie 94260 fresnes | 678398215 | hugo.blanchard@gmail.com |
+    Then I should have response "BAD_REQUEST"
+    And following error : "Phone format incorrect (+33 or 0 or 0033 follewed by 9 digits)"
 
   Scenario: Update an inexistant user
     When I update the "user" having id "63dcff89-47c5-4365-875d-6c4d9fef9abc" with following data:

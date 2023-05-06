@@ -7,5 +7,5 @@ export default (repository) => ({
   statusCtrl,
   recipeCtrl: recipeCtrl(repository.recipeRepo),
   userCtrl: userCtrl(repository.userRepo),
-  orderCtrl: orderCtrl(repository.orderRepo)
+  orderCtrl: orderCtrl(repository.orderRepo, repository.userRepo, repository.recipeRepo)
 });
